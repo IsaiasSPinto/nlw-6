@@ -1,6 +1,6 @@
 import { useHistory } from 'react-router-dom';
-
-import { auth, firebase , database } from '../services/firebase'
+import { auth, firebase, database } from '../services/firebase'
+import { useContext } from 'react';
 
 
 import illustrationImg from '../assets/images/illustration.svg'
@@ -9,20 +9,21 @@ import googleIconImg from '../assets/images/google-icon.svg'
 
 import '../styles/auth.scss';
 import { Button } from '../components/button';
+import { AuthContext } from '../contexts/AuthContext';
+
+
+
 
 export function Home() {
     const history = useHistory();
+    const { user, signInWIthGoogle } = useContext(AuthContext)
 
-    function handleCreateRoom() {
-        const provider = new firebase.auth.GoogleAuthProvider();
+    async function handleCreateRoom() {
+        if (!user) {
+            await signInWIthGoogle();
+        }
 
-        auth.signInWithPopup(provider).then(result => {
-            console.log(result);
-
-            history.push('/rooms/new')
-        })
-
-        
+        history.push('/rooms/new')
     }
 
     return (
@@ -35,7 +36,7 @@ export function Home() {
             <main>
                 <div className="main-content">
                     <img src={logoImg} alt="Let me ask logo" />
-                    <button onClick = {handleCreateRoom} className="create-room">
+                    <button onClick={handleCreateRoom} className="create-room">
                         <img src={googleIconImg} alt="Logo do google" />
                         Crie sua sala com o google
                     </button>
